@@ -103,3 +103,34 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Additional design tokens */
+@layer base {
+  :root {
+    --brand: 252 83% 60%; /* Indigo */
+    --brand-2: 199 89% 48%; /* Sky */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--brand)), hsl(var(--brand-2)));
+    --shadow-elevated: 0 12px 30px -12px hsl(var(--brand) / 0.35);
+    --shadow-soft: 0 6px 18px -6px hsl(var(--foreground) / 0.08);
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Feedback colors */
+    --success: 158 64% 45%;
+    --success-foreground: 0 0% 98%;
+  }
+  .dark {
+    --brand: 252 83% 68%;
+    --brand-2: 199 89% 56%;
+    --shadow-elevated: 0 12px 30px -12px hsl(var(--brand) / 0.45);
+    --shadow-soft: 0 6px 18px -6px hsl(var(--foreground) / 0.24);
+  }
+}
+
+/* Utilities bound to tokens */
+@layer utilities {
+  .bg-gradient-primary { background-image: var(--gradient-primary); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .tilt-hover { transition: var(--transition-smooth); }
+  .tilt-hover:hover { transform: perspective(800px) rotateX(3deg) rotateY(-3deg) translateY(-2px); }
+}
