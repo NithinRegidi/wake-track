@@ -2,10 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import AuthGate, { clearLocalUser } from "@/components/auth/AuthGate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivitySlot, Category } from "@/components/tracker/ActivitySlot";
 import SummaryChart from "@/components/tracker/SummaryChart";
+import { WeeklyView } from "@/components/tracker/WeeklyView";
+import { MonthlyView } from "@/components/tracker/MonthlyView";
+import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp } from "lucide-react";
 
 // Types
 interface ActivityItem { text: string; category: Category }
@@ -102,7 +106,22 @@ const Tracker = ({ userId }: { userId: string }) => {
   const [date, setDate] = useState<string>(todayISO());
   const [data, setData] = useState<DayActivities>(() => loadDay(userId, todayISO()));
   const [insights, setInsights] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("daily");
   const counts = useMemo(() => computeCounts(data), [data]);
+
+  // Calculate week start (Monday) for weekly view
+  const getWeekStart = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const monday = new Date(date.setDate(diff));
+    return monday.toISOString().split("T")[0];
+  };
+
+  // Get current month for monthly view
+  const getCurrentMonth = (dateStr: string) => {
+    return dateStr.substring(0, 7); // YYYY-MM
+  };
 
   useEffect(() => {
     setData(loadDay(userId, date));
@@ -143,74 +162,109 @@ const Tracker = ({ userId }: { userId: string }) => {
         </div>
       </div>
 
-      <Card className="shadow-elevated">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle>Today's Log</CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
-            <label htmlFor="date-picker" className="text-sm text-muted-foreground">Date</label>
-            <Input id="date-picker" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-auto" />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {HOURS_RANGE.map((h) => {
-            const key = toHourKey(h);
-            const item = data[key] ?? { text: "", category: "neutral" as Category };
-            return (
-              <ActivitySlot
-                key={key}
-                label={formatLabel(h)}
-                hourKey={key}
-                text={item.text}
-                category={item.category}
-                onTextChange={onTextChange}
-                onCategoryChange={onCategoryChange}
-              />
-            );
-          })}
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="daily" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Daily
+          </TabsTrigger>
+          <TabsTrigger value="weekly" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Weekly
+          </TabsTrigger>
+          <TabsTrigger value="monthly" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Monthly
+          </TabsTrigger>
+          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Dashboard
+          </TabsTrigger>
+        </TabsList>
 
-      <Card className="shadow-elevated">
-        <CardHeader>
-          <CardTitle className="text-center">Productivity Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <SummaryChart productive={counts.productive} unproductive={counts.unproductive} neutral={counts.neutral} />
-            <div className="text-center md:text-left space-y-4">
-              <div className="rounded-lg p-4 bg-success/15">
-                <p className="text-lg font-medium">Productive Hours</p>
-                <p className="text-3xl font-bold">{counts.productive}</p>
+        <TabsContent value="daily" className="space-y-6 mt-6">
+          <Card className="shadow-elevated">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <CardTitle>Today's Log</CardTitle>
               </div>
-              <div className="rounded-lg p-4 bg-destructive/10">
-                <p className="text-lg font-medium">Unproductive Hours</p>
-                <p className="text-3xl font-bold">{counts.unproductive}</p>
+              <div className="flex items-center gap-2">
+                <label htmlFor="date-picker" className="text-sm text-muted-foreground">Date</label>
+                <Input id="date-picker" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-auto" />
               </div>
-              <div className="rounded-lg p-4 bg-muted/50">
-                <p className="text-lg font-medium">Uncategorized Hours</p>
-                <p className="text-3xl font-bold">{counts.neutral}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => setInsights(generateInsights(date, data))}>Get Daily Insights</Button>
-                <Button variant="secondary" onClick={exportJson}>Export JSON</Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {HOURS_RANGE.map((h) => {
+                const key = toHourKey(h);
+                const item = data[key] ?? { text: "", category: "neutral" as Category };
+                return (
+                  <ActivitySlot
+                    key={key}
+                    label={formatLabel(h)}
+                    hourKey={key}
+                    text={item.text}
+                    category={item.category}
+                    onTextChange={onTextChange}
+                    onCategoryChange={onCategoryChange}
+                  />
+                );
+              })}
+            </CardContent>
+          </Card>
 
-      <Card className="shadow-elevated">
-        <CardHeader>
-          <CardTitle className="text-center">Daily Insights</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-accent/50 rounded-md p-4 whitespace-pre-wrap min-h-[96px]">
-            {insights || "Insights will appear here after you click the button."}
-          </div>
-        </CardContent>
-      </Card>
+          <Card className="shadow-elevated">
+            <CardHeader>
+              <CardTitle className="text-center">Productivity Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <SummaryChart productive={counts.productive} unproductive={counts.unproductive} neutral={counts.neutral} />
+                <div className="text-center md:text-left space-y-4">
+                  <div className="rounded-lg p-4 bg-success/15">
+                    <p className="text-lg font-medium">Productive Hours</p>
+                    <p className="text-3xl font-bold">{counts.productive}</p>
+                  </div>
+                  <div className="rounded-lg p-4 bg-destructive/10">
+                    <p className="text-lg font-medium">Unproductive Hours</p>
+                    <p className="text-3xl font-bold">{counts.unproductive}</p>
+                  </div>
+                  <div className="rounded-lg p-4 bg-muted/50">
+                    <p className="text-lg font-medium">Uncategorized Hours</p>
+                    <p className="text-3xl font-bold">{counts.neutral}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setInsights(generateInsights(date, data))}>Get Daily Insights</Button>
+                    <Button variant="secondary" onClick={exportJson}>Export JSON</Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-elevated">
+            <CardHeader>
+              <CardTitle className="text-center">Daily Insights</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-accent/50 rounded-md p-4 whitespace-pre-wrap min-h-[96px]">
+                {insights || "Insights will appear here after you click the button."}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="weekly" className="mt-6">
+          <WeeklyView userId={userId} startDate={getWeekStart(date)} />
+        </TabsContent>
+
+        <TabsContent value="monthly" className="mt-6">
+          <MonthlyView userId={userId} month={getCurrentMonth(date)} />
+        </TabsContent>
+
+        <TabsContent value="dashboard" className="mt-6">
+          <ProductivityDashboard userId={userId} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
