@@ -112,6 +112,7 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(var(--brand)), hsl(var(--brand-2)));
     --shadow-elevated: 0 12px 30px -12px hsl(var(--brand) / 0.35);
     --shadow-soft: 0 6px 18px -6px hsl(var(--foreground) / 0.08);
+    --shadow-glow: 0 0 25px hsl(var(--brand) / 0.25), 0 0 50px hsl(var(--brand) / 0.15);
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Feedback colors */
@@ -123,6 +124,7 @@ All colors MUST be HSL.
     --brand-2: 199 89% 56%;
     --shadow-elevated: 0 12px 30px -12px hsl(var(--brand) / 0.45);
     --shadow-soft: 0 6px 18px -6px hsl(var(--foreground) / 0.24);
+    --shadow-glow: 0 0 30px hsl(var(--brand) / 0.35), 0 0 60px hsl(var(--brand) / 0.2);
   }
 }
 
@@ -131,6 +133,12 @@ All colors MUST be HSL.
   .bg-gradient-primary { background-image: var(--gradient-primary); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
   .tilt-hover { transition: var(--transition-smooth); }
   .tilt-hover:hover { transform: perspective(800px) rotateX(3deg) rotateY(-3deg) translateY(-2px); }
+  
+  /* Tab animations */
+  .tab-active { 
+    animation: scale-in 0.3s ease-out, fade-in 0.2s ease-out; 
+  }
 }
