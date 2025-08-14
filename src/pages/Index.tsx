@@ -163,34 +163,34 @@ const Tracker = ({ userId }: { userId: string }) => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gradient-to-r from-muted/50 to-muted/30 p-2 rounded-xl shadow-elegant border border-border/20 backdrop-blur-sm">
+        <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground w-full max-w-md mx-auto">
           <TabsTrigger 
             value="daily" 
-            className="flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-glow data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:border data-[state=active]:border-primary/20 hover:bg-background/80"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
-            <Calendar className="h-4 w-4 transition-transform duration-200 group-hover:rotate-3" />
-            <span className="font-semibold">Daily</span>
+            <Calendar className="h-4 w-4" />
+            Daily
           </TabsTrigger>
           <TabsTrigger 
             value="weekly" 
-            className="flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-glow data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:border data-[state=active]:border-primary/20 hover:bg-background/80"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
-            <BarChart3 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="font-semibold">Weekly</span>
+            <BarChart3 className="h-4 w-4" />
+            Weekly
           </TabsTrigger>
           <TabsTrigger 
             value="monthly" 
-            className="flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-glow data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:border data-[state=active]:border-primary/20 hover:bg-background/80"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
-            <TrendingUp className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
-            <span className="font-semibold">Monthly</span>
+            <TrendingUp className="h-4 w-4" />
+            Monthly
           </TabsTrigger>
           <TabsTrigger 
             value="dashboard" 
-            className="flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-glow data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:border data-[state=active]:border-primary/20 hover:bg-background/80"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
-            <BarChart3 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-6" />
-            <span className="font-semibold">Dashboard</span>
+            <BarChart3 className="h-4 w-4" />
+            Dashboard
           </TabsTrigger>
         </TabsList>
 
