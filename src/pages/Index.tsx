@@ -9,7 +9,9 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target } from "lucide-react";
+import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
+import { GoalProgress } from "@/components/tracker/GoalProgress";
 
 // Types
 interface ActivityItem { text: string; category: Category }
@@ -107,6 +109,7 @@ const Tracker = ({ userId }: { userId: string }) => {
   const [data, setData] = useState<DayActivities>(() => loadDay(userId, todayISO()));
   const [insights, setInsights] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("daily");
+  const [goals, setGoals] = useState<Goal[]>([]);
   const counts = useMemo(() => computeCounts(data), [data]);
 
   // Calculate week start (Monday) for weekly view
@@ -123,10 +126,21 @@ const Tracker = ({ userId }: { userId: string }) => {
     return dateStr.substring(0, 7); // YYYY-MM
   };
 
+  // Load goals
+  const loadGoals = () => {
+    const goalsKey = `goals_${userId}`;
+    const savedGoals = JSON.parse(localStorage.getItem(goalsKey) || '[]');
+    setGoals(savedGoals);
+  };
+
   useEffect(() => {
     setData(loadDay(userId, date));
     setInsights("");
   }, [userId, date]);
+
+  useEffect(() => {
+    loadGoals();
+  }, [userId]);
 
   useEffect(() => {
     saveDay(userId, date, data);
@@ -163,31 +177,38 @@ const Tracker = ({ userId }: { userId: string }) => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground w-full max-w-md mx-auto">
+        <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground w-full max-w-2xl mx-auto">
           <TabsTrigger 
             value="daily" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
             <Calendar className="h-4 w-4" />
             Daily
           </TabsTrigger>
           <TabsTrigger 
             value="weekly" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
             <BarChart3 className="h-4 w-4" />
             Weekly
           </TabsTrigger>
           <TabsTrigger 
             value="monthly" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
             <TrendingUp className="h-4 w-4" />
             Monthly
           </TabsTrigger>
           <TabsTrigger 
+            value="goals" 
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+          >
+            <Target className="h-4 w-4" />
+            Goals
+          </TabsTrigger>
+          <TabsTrigger 
             value="dashboard" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
           >
             <BarChart3 className="h-4 w-4" />
             Dashboard
@@ -271,6 +292,17 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="monthly" className="mt-6">
           <MonthlyView userId={userId} month={getCurrentMonth(date)} />
+        </TabsContent>
+
+        <TabsContent value="goals" className="mt-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Goals & Progress</h2>
+              <p className="text-muted-foreground">Set and track your productivity goals</p>
+            </div>
+            <GoalSetting userId={userId} onGoalCreated={loadGoals} />
+          </div>
+          <GoalProgress userId={userId} goals={goals} onGoalsChange={loadGoals} />
         </TabsContent>
 
         <TabsContent value="dashboard" className="mt-6">
