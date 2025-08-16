@@ -118,6 +118,10 @@ All colors MUST be HSL.
     /* Feedback colors */
     --success: 158 64% 45%;
     --success-foreground: 0 0% 98%;
+    
+    /* AI/Brand colors */
+    --brand: 252 83% 60%;
+    --brand-foreground: 0 0% 98%;
   }
   .dark {
     --brand: 252 83% 68%;

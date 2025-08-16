@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { LogOut, Calendar, BarChart3, TrendingUp, Target } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
+import { AISuggestions } from "@/components/tracker/AISuggestions";
 
 // Types
 interface ActivityItem { text: string; category: Category }
@@ -239,51 +240,58 @@ const Tracker = ({ userId }: { userId: string }) => {
                     category={item.category}
                     onTextChange={onTextChange}
                     onCategoryChange={onCategoryChange}
+                    enableAIAssist={true}
                   />
                 );
               })}
             </CardContent>
           </Card>
 
-          <Card className="shadow-elevated">
-            <CardHeader>
-              <CardTitle className="text-center">Productivity Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <SummaryChart productive={counts.productive} unproductive={counts.unproductive} neutral={counts.neutral} />
-                <div className="text-center md:text-left space-y-4">
-                  <div className="rounded-lg p-4 bg-success/15">
-                    <p className="text-lg font-medium">Productive Hours</p>
-                    <p className="text-3xl font-bold">{counts.productive}</p>
-                  </div>
-                  <div className="rounded-lg p-4 bg-destructive/10">
-                    <p className="text-lg font-medium">Unproductive Hours</p>
-                    <p className="text-3xl font-bold">{counts.unproductive}</p>
-                  </div>
-                  <div className="rounded-lg p-4 bg-muted/50">
-                    <p className="text-lg font-medium">Uncategorized Hours</p>
-                    <p className="text-3xl font-bold">{counts.neutral}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="shadow-elevated">
+              <CardHeader>
+                <CardTitle className="text-center">Productivity Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-6 items-center">
+                  <SummaryChart productive={counts.productive} unproductive={counts.unproductive} neutral={counts.neutral} />
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg p-3 bg-success/15 text-center">
+                      <p className="text-sm font-medium">Productive</p>
+                      <p className="text-2xl font-bold">{counts.productive}h</p>
+                    </div>
+                    <div className="rounded-lg p-3 bg-destructive/10 text-center">
+                      <p className="text-sm font-medium">Unproductive</p>
+                      <p className="text-2xl font-bold">{counts.unproductive}h</p>
+                    </div>
+                    <div className="rounded-lg p-3 bg-muted/50 text-center">
+                      <p className="text-sm font-medium">Uncategorized</p>
+                      <p className="text-2xl font-bold">{counts.neutral}h</p>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <Button onClick={() => setInsights(generateInsights(date, data))}>Get Daily Insights</Button>
                     <Button variant="secondary" onClick={exportJson}>Export JSON</Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card className="shadow-elevated">
-            <CardHeader>
-              <CardTitle className="text-center">Daily Insights</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-accent/50 rounded-md p-4 whitespace-pre-wrap min-h-[96px]">
-                {insights || "Insights will appear here after you click the button."}
-              </div>
-            </CardContent>
-          </Card>
+            <AISuggestions userId={userId} />
+          </div>
+
+          {insights && (
+            <Card className="shadow-elevated">
+              <CardHeader>
+                <CardTitle className="text-center">Daily Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-accent/50 rounded-md p-4 whitespace-pre-wrap min-h-[96px]">
+                  {insights}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="weekly" className="mt-6">
