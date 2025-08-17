@@ -9,11 +9,12 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
 import { NotificationSettings } from "@/components/tracker/NotificationSettings";
+import { AdvancedAnalytics } from "@/components/tracker/AdvancedAnalytics";
 import { useNotifications } from "@/hooks/useNotifications";
 
 // Types
@@ -183,51 +184,37 @@ const Tracker = ({ userId }: { userId: string }) => {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground w-full max-w-2xl mx-auto">
-          <TabsTrigger 
-            value="daily" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <Calendar className="h-4 w-4" />
-            Daily
-          </TabsTrigger>
-          <TabsTrigger 
-            value="weekly" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <BarChart3 className="h-4 w-4" />
-            Weekly
-          </TabsTrigger>
-          <TabsTrigger 
-            value="monthly" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <TrendingUp className="h-4 w-4" />
-            Monthly
-          </TabsTrigger>
-          <TabsTrigger 
-            value="goals" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <Target className="h-4 w-4" />
-            Goals
-          </TabsTrigger>
-          <TabsTrigger 
-            value="dashboard" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <BarChart3 className="h-4 w-4" />
-            Dashboard
-          </TabsTrigger>
-          <TabsTrigger 
-            value="notifications" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
-          >
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="daily" className="flex items-center gap-1">
+              <Calendar className="h-4 w-4" />
+              Daily
+            </TabsTrigger>
+            <TabsTrigger value="weekly" className="flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
+              Weekly
+            </TabsTrigger>
+            <TabsTrigger value="monthly" className="flex items-center gap-1">
+              <TrendingUp className="h-4 w-4" />
+              Monthly
+            </TabsTrigger>
+            <TabsTrigger value="goals" className="flex items-center gap-1">
+              <Target className="h-4 w-4" />
+              Goals
+            </TabsTrigger>
+            <TabsTrigger value="dashboard" className="flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1">
+              <BarChart className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-1">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
+          </TabsList>
 
         <TabsContent value="daily" className="space-y-6 mt-6">
           <Card className="shadow-elevated">
@@ -328,6 +315,10 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="dashboard" className="mt-6">
           <ProductivityDashboard userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-6">
+          <AdvancedAnalytics userId={userId} />
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-6">
