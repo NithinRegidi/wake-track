@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { ThumbsUp, Ban, Sparkles } from "lucide-react";
 import { categorizeActivity } from "@/lib/ai-suggestions";
 import { useEffect, useState } from "react";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export type Category = "productive" | "unproductive" | "neutral";
 
@@ -29,6 +30,7 @@ export const ActivitySlot = ({
   const isUnprod = category === "unproductive";
   const [suggestedCategory, setSuggestedCategory] = useState<Category | null>(null);
   const [showSuggestion, setShowSuggestion] = useState(false);
+  const { sendSmartSuggestion } = useNotifications();
 
   // Auto-categorize on text change
   useEffect(() => {
@@ -37,6 +39,13 @@ export const ActivitySlot = ({
       if (suggested !== category) {
         setSuggestedCategory(suggested);
         setShowSuggestion(true);
+        
+        // Send smart notification for productivity insights
+        if (suggested === 'productive') {
+          sendSmartSuggestion(`💡 "${text}" looks productive! Consider marking it as such.`);
+        } else if (suggested === 'unproductive') {
+          sendSmartSuggestion(`⚠️ "${text}" might be unproductive. Could you optimize this time?`);
+        }
         
         // Auto-hide suggestion after 10 seconds
         const timer = setTimeout(() => {

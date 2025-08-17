@@ -9,10 +9,12 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
+import { NotificationSettings } from "@/components/tracker/NotificationSettings";
+import { useNotifications } from "@/hooks/useNotifications";
 
 // Types
 interface ActivityItem { text: string; category: Category }
@@ -111,6 +113,7 @@ const Tracker = ({ userId }: { userId: string }) => {
   const [insights, setInsights] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("daily");
   const [goals, setGoals] = useState<Goal[]>([]);
+  const { recordActivity, sendSmartSuggestion, sendGoalReminder } = useNotifications();
   const counts = useMemo(() => computeCounts(data), [data]);
 
   // Calculate week start (Monday) for weekly view
@@ -145,13 +148,16 @@ const Tracker = ({ userId }: { userId: string }) => {
 
   useEffect(() => {
     saveDay(userId, date, data);
-  }, [userId, date, data]);
+    recordActivity(); // Track activity for notifications
+  }, [userId, date, data, recordActivity]);
 
   const onTextChange = (hourKey: string, value: string) => {
     setData((prev) => ({ ...prev, [hourKey]: { ...prev[hourKey], text: value } }));
+    recordActivity(); // Track user interaction
   };
   const onCategoryChange = (hourKey: string, category: Category) => {
     setData((prev) => ({ ...prev, [hourKey]: { ...prev[hourKey], category } }));
+    recordActivity(); // Track user interaction
   };
 
   const exportJson = () => {
@@ -213,6 +219,13 @@ const Tracker = ({ userId }: { userId: string }) => {
           >
             <BarChart3 className="h-4 w-4" />
             Dashboard
+          </TabsTrigger>
+          <TabsTrigger 
+            value="notifications" 
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/60 flex-1"
+          >
+            <Bell className="h-4 w-4" />
+            Notifications
           </TabsTrigger>
         </TabsList>
 
@@ -315,6 +328,10 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="dashboard" className="mt-6">
           <ProductivityDashboard userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="mt-6">
+          <NotificationSettings />
         </TabsContent>
       </Tabs>
     </div>
