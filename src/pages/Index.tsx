@@ -193,35 +193,35 @@ const Tracker = ({ userId }: { userId: string }) => {
           <TabsList className="flex flex-wrap w-full h-auto p-1 gap-1">
             <TabsTrigger value="daily" className="flex items-center gap-1 flex-shrink-0">
               <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">Daily</span>
+              Daily
             </TabsTrigger>
             <TabsTrigger value="weekly" className="flex items-center gap-1 flex-shrink-0">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Weekly</span>
+              Weekly
             </TabsTrigger>
             <TabsTrigger value="monthly" className="flex items-center gap-1 flex-shrink-0">
               <TrendingUp className="h-4 w-4" />
-              <span className="hidden sm:inline">Monthly</span>
+              Monthly
             </TabsTrigger>
             <TabsTrigger value="goals" className="flex items-center gap-1 flex-shrink-0">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Goals</span>
+              Goals
             </TabsTrigger>
             <TabsTrigger value="dashboard" className="flex items-center gap-1 flex-shrink-0">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+              Dashboard
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-1 flex-shrink-0">
               <BarChart className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="gamification" className="flex items-center gap-1 flex-shrink-0">
               <Trophy className="h-4 w-4" />
-              <span className="hidden sm:inline">Rewards</span>
+              Rewards
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-1 flex-shrink-0">
               <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Notifications</span>
+              Notifications
             </TabsTrigger>
           </TabsList>
 
