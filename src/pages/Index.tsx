@@ -9,13 +9,15 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
 import { NotificationSettings } from "@/components/tracker/NotificationSettings";
 import { AdvancedAnalytics } from "@/components/tracker/AdvancedAnalytics";
+import { GamificationDisplay } from "@/components/tracker/GamificationDisplay";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useGamification } from "@/hooks/useGamification";
 
 // Types
 interface ActivityItem { text: string; category: Category }
@@ -115,6 +117,7 @@ const Tracker = ({ userId }: { userId: string }) => {
   const [activeTab, setActiveTab] = useState<string>("daily");
   const [goals, setGoals] = useState<Goal[]>([]);
   const { recordActivity, sendSmartSuggestion, sendGoalReminder } = useNotifications();
+  const { data: gamificationData, awardPoints, updateGamificationData } = useGamification(userId);
   const counts = useMemo(() => computeCounts(data), [data]);
 
   // Calculate week start (Monday) for weekly view
@@ -158,7 +161,9 @@ const Tracker = ({ userId }: { userId: string }) => {
   };
   const onCategoryChange = (hourKey: string, category: Category) => {
     setData((prev) => ({ ...prev, [hourKey]: { ...prev[hourKey], category } }));
+    awardPoints(category, hourKey); // Award gamification points
     recordActivity(); // Track user interaction
+    updateGamificationData(); // Update badges and challenges
   };
 
   const exportJson = () => {
@@ -185,7 +190,7 @@ const Tracker = ({ userId }: { userId: string }) => {
       </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="daily" className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               Daily
@@ -209,6 +214,10 @@ const Tracker = ({ userId }: { userId: string }) => {
             <TabsTrigger value="analytics" className="flex items-center gap-1">
               <BarChart className="h-4 w-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="gamification" className="flex items-center gap-1">
+              <Trophy className="h-4 w-4" />
+              Rewards
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-1">
               <Bell className="h-4 w-4" />
@@ -319,6 +328,10 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="analytics" className="mt-6">
           <AdvancedAnalytics userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="gamification" className="mt-6">
+          <GamificationDisplay userId={userId} />
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-6">
