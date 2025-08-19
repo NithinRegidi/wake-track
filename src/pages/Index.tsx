@@ -190,38 +190,38 @@ const Tracker = ({ userId }: { userId: string }) => {
       </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="daily" className="flex items-center gap-1">
+          <TabsList className="flex flex-wrap w-full h-auto p-1 gap-1">
+            <TabsTrigger value="daily" className="flex items-center gap-1 flex-shrink-0">
               <Calendar className="h-4 w-4" />
-              Daily
+              <span className="hidden sm:inline">Daily</span>
             </TabsTrigger>
-            <TabsTrigger value="weekly" className="flex items-center gap-1">
+            <TabsTrigger value="weekly" className="flex items-center gap-1 flex-shrink-0">
               <BarChart3 className="h-4 w-4" />
-              Weekly
+              <span className="hidden sm:inline">Weekly</span>
             </TabsTrigger>
-            <TabsTrigger value="monthly" className="flex items-center gap-1">
+            <TabsTrigger value="monthly" className="flex items-center gap-1 flex-shrink-0">
               <TrendingUp className="h-4 w-4" />
-              Monthly
+              <span className="hidden sm:inline">Monthly</span>
             </TabsTrigger>
-            <TabsTrigger value="goals" className="flex items-center gap-1">
+            <TabsTrigger value="goals" className="flex items-center gap-1 flex-shrink-0">
               <Target className="h-4 w-4" />
-              Goals
+              <span className="hidden sm:inline">Goals</span>
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex items-center gap-1">
+            <TabsTrigger value="dashboard" className="flex items-center gap-1 flex-shrink-0">
               <BarChart3 className="h-4 w-4" />
-              Dashboard
+              <span className="hidden sm:inline">Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-1">
+            <TabsTrigger value="analytics" className="flex items-center gap-1 flex-shrink-0">
               <BarChart className="h-4 w-4" />
-              Analytics
+              <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="gamification" className="flex items-center gap-1">
+            <TabsTrigger value="gamification" className="flex items-center gap-1 flex-shrink-0">
               <Trophy className="h-4 w-4" />
-              Rewards
+              <span className="hidden sm:inline">Rewards</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-1">
+            <TabsTrigger value="notifications" className="flex items-center gap-1 flex-shrink-0">
               <Bell className="h-4 w-4" />
-              Notifications
+              <span className="hidden sm:inline">Notifications</span>
             </TabsTrigger>
           </TabsList>
 
