@@ -9,19 +9,21 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy, Search, Database } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
 import { NotificationSettings } from "@/components/tracker/NotificationSettings";
 import { AdvancedAnalytics } from "@/components/tracker/AdvancedAnalytics";
 import { GamificationDisplay } from "@/components/tracker/GamificationDisplay";
+import { DataManagement } from "@/components/tracker/DataManagement";
+import { SearchAndFilter } from "@/components/tracker/SearchAndFilter";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useGamification } from "@/hooks/useGamification";
 
 // Types
-interface ActivityItem { text: string; category: Category }
-type DayActivities = Record<string, ActivityItem>;
+export interface ActivityItem { text: string; category: Category }
+export type DayActivities = Record<string, ActivityItem>;
 
 // Helpers
 const HOURS_RANGE = Array.from({ length: 24 }, (_, i) => (i + 5) % 24); // 5:00 -> 4:00 next day
@@ -223,6 +225,14 @@ const Tracker = ({ userId }: { userId: string }) => {
               <Bell className="h-4 w-4" />
               Notifications
             </TabsTrigger>
+            <TabsTrigger value="search" className="flex items-center gap-1 flex-shrink-0">
+              <Search className="h-4 w-4" />
+              Search
+            </TabsTrigger>
+            <TabsTrigger value="data" className="flex items-center gap-1 flex-shrink-0">
+              <Database className="h-4 w-4" />
+              Data
+            </TabsTrigger>
           </TabsList>
 
         <TabsContent value="daily" className="space-y-6 mt-6">
@@ -336,6 +346,14 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="notifications" className="mt-6">
           <NotificationSettings />
+        </TabsContent>
+
+        <TabsContent value="search" className="mt-6">
+          <SearchAndFilter userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="data" className="mt-6">
+          <DataManagement userId={userId} />
         </TabsContent>
       </Tabs>
     </div>
