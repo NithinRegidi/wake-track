@@ -9,7 +9,7 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy, Search, Database, BookTemplate, Copy } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy, Search, Database, BookTemplate, Copy, Clock } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
@@ -21,6 +21,9 @@ import { SearchAndFilter } from "@/components/tracker/SearchAndFilter";
 import { TemplateManager } from "@/components/tracker/TemplateManager";
 import { BulkOperations } from "@/components/tracker/BulkOperations";
 import { QuickActions } from "@/components/tracker/QuickActions";
+import { PomodoroTimer } from "@/components/tracker/PomodoroTimer";
+import { BreakReminders } from "@/components/tracker/BreakReminders";
+import { TimeTrackingDashboard } from "@/components/tracker/TimeTrackingDashboard";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useGamification } from "@/hooks/useGamification";
 
@@ -244,6 +247,10 @@ const Tracker = ({ userId }: { userId: string }) => {
               <Copy className="h-4 w-4" />
               Bulk Ops
             </TabsTrigger>
+            <TabsTrigger value="time" className="flex items-center gap-1 flex-shrink-0">
+              <Clock className="h-4 w-4" />
+              Time Mgmt
+            </TabsTrigger>
           </TabsList>
 
         <TabsContent value="daily" className="space-y-6 mt-6">
@@ -377,6 +384,14 @@ const Tracker = ({ userId }: { userId: string }) => {
 
         <TabsContent value="bulk" className="mt-6">
           <BulkOperations userId={userId} currentDate={date} />
+        </TabsContent>
+
+        <TabsContent value="time" className="mt-6 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PomodoroTimer userId={userId} />
+            <BreakReminders userId={userId} />
+          </div>
+          <TimeTrackingDashboard userId={userId} currentDate={date} />
         </TabsContent>
       </Tabs>
 
