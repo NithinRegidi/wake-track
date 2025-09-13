@@ -9,7 +9,7 @@ import { WeeklyView } from "@/components/tracker/WeeklyView";
 import { MonthlyView } from "@/components/tracker/MonthlyView";
 import { ProductivityDashboard } from "@/components/tracker/ProductivityDashboard";
 import { Input } from "@/components/ui/input";
-import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy, Search, Database } from "lucide-react";
+import { LogOut, Calendar, BarChart3, TrendingUp, Target, Bell, BarChart, Trophy, Search, Database, BookTemplate, Copy } from "lucide-react";
 import { GoalSetting, Goal } from "@/components/tracker/GoalSetting";
 import { GoalProgress } from "@/components/tracker/GoalProgress";
 import { AISuggestions } from "@/components/tracker/AISuggestions";
@@ -18,6 +18,9 @@ import { AdvancedAnalytics } from "@/components/tracker/AdvancedAnalytics";
 import { GamificationDisplay } from "@/components/tracker/GamificationDisplay";
 import { DataManagement } from "@/components/tracker/DataManagement";
 import { SearchAndFilter } from "@/components/tracker/SearchAndFilter";
+import { TemplateManager } from "@/components/tracker/TemplateManager";
+import { BulkOperations } from "@/components/tracker/BulkOperations";
+import { QuickActions } from "@/components/tracker/QuickActions";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useGamification } from "@/hooks/useGamification";
 
@@ -233,6 +236,14 @@ const Tracker = ({ userId }: { userId: string }) => {
               <Database className="h-4 w-4" />
               Data
             </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-1 flex-shrink-0">
+              <BookTemplate className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="bulk" className="flex items-center gap-1 flex-shrink-0">
+              <Copy className="h-4 w-4" />
+              Bulk Ops
+            </TabsTrigger>
           </TabsList>
 
         <TabsContent value="daily" className="space-y-6 mt-6">
@@ -355,7 +366,29 @@ const Tracker = ({ userId }: { userId: string }) => {
         <TabsContent value="data" className="mt-6">
           <DataManagement userId={userId} />
         </TabsContent>
+
+        <TabsContent value="templates" className="mt-6">
+          <TemplateManager 
+            userId={userId} 
+            currentDate={date} 
+            dayActivities={data} 
+          />
+        </TabsContent>
+
+        <TabsContent value="bulk" className="mt-6">
+          <BulkOperations userId={userId} currentDate={date} />
+        </TabsContent>
       </Tabs>
+
+      {/* Quick Actions Floating Button */}
+      <QuickActions 
+        userId={userId} 
+        currentDate={date}
+        onActivityAdded={() => {
+          // Force refresh of day activities
+          setData(loadDay(userId, date));
+        }}
+      />
     </div>
   );
 };
