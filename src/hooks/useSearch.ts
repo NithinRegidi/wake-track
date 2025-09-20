@@ -1,90 +1,167 @@
-import { useState, useMemo, useCallback } from "react";
-import { Category } from "@/components/tracker/ActivitySlot";
+import { useState, useEffect, useMemo } from 'react';
+import { format, parseISO, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 
-interface SearchResult {
-  date: string;
-  hour: string;
-  activity: string;
-  category: Category;
-  formattedDate: string;
-  formattedTime: string;
+interface SearchFilters {
+  searchTerm: string;
+  category: 'all' | 'productive' | 'unproductive' | 'neutral';
+  dateFrom?: Date;
+  dateTo?: Date;
+  timeFrom?: string;
+  timeTo?: string;
 }
 
-export function useSearch(userId: string) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
-  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+interface ActivityEntry {
+  date: string;
+  hour: string;
+  text: string;
+  category: 'productive' | 'unproductive' | 'neutral';
+}
 
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim() && categoryFilter === "all" && !dateRange.start) {
-      return [];
-    }
+export const useSearch = () => {
+  const [filters, setFilters] = useState<SearchFilters>({
+    searchTerm: '',
+    category: 'all',
+  });
 
-    const results: SearchResult[] = [];
-    const keys = Object.keys(localStorage);
+  const [allActivities, setAllActivities] = useState<ActivityEntry[]>([]);
+
+  // Load all activities from localStorage
+  useEffect(() => {
+    const activities: ActivityEntry[] = [];
+    const keys = Object.keys(localStorage).filter(key => key.startsWith('wt:'));
     
     keys.forEach(key => {
-      if (key.startsWith(`wt:${userId}:`)) {
-        const date = key.replace(`wt:${userId}:`, '');
-        
-        // Date range filter
-        if (dateRange.start && date < dateRange.start) return;
-        if (dateRange.end && date > dateRange.end) return;
-
+      const parts = key.split(':');
+      if (parts.length >= 3) {
+        const date = parts[2];
         try {
           const dayData = JSON.parse(localStorage.getItem(key) || '{}');
-          
-          Object.entries(dayData).forEach(([hour, activity]: [string, any]) => {
-            const activityText = activity.text?.toLowerCase() || '';
-            const matchesSearch = !searchQuery.trim() || 
-              activityText.includes(searchQuery.toLowerCase());
-            
-            const matchesCategory = categoryFilter === "all" || 
-              activity.category === categoryFilter;
-
-            if (matchesSearch && matchesCategory && activityText.trim()) {
-              const hourNum = parseInt(hour.split(':')[0]);
-              const ampm = hourNum < 12 ? 'AM' : 'PM';
-              const displayHour = hourNum % 12 === 0 ? 12 : hourNum % 12;
-              
-              results.push({
+          Object.entries(dayData).forEach(([hour, data]: [string, any]) => {
+            if (data && typeof data === 'object' && data.text && data.text.trim()) {
+              activities.push({
                 date,
                 hour,
-                activity: activity.text,
-                category: activity.category,
-                formattedDate: new Date(date + 'T00:00:00').toLocaleDateString(),
-                formattedTime: `${displayHour}:00 ${ampm}`
+                text: data.text,
+                category: data.category || 'neutral',
               });
             }
           });
         } catch (error) {
-          // Skip invalid data
+          console.error('Error parsing stored data:', error);
         }
       }
     });
 
-    // Sort by date and time (most recent first)
-    return results.sort((a, b) => {
+    activities.sort((a, b) => {
       const dateCompare = b.date.localeCompare(a.date);
       if (dateCompare !== 0) return dateCompare;
-      return b.hour.localeCompare(a.hour);
+      return parseInt(b.hour) - parseInt(a.hour);
     });
-  }, [userId, searchQuery, categoryFilter, dateRange]);
 
-  const clearSearch = useCallback(() => {
-    setSearchQuery("");
-    setCategoryFilter("all");
-    setDateRange({ start: "", end: "" });
+    setAllActivities(activities);
   }, []);
 
-  return {
-    searchQuery,
-    setSearchQuery,
-    categoryFilter,
-    setCategoryFilter,
-    dateRange,
-    setDateRange,
-    searchResults,
-    clearSearch
+  const filteredActivities = useMemo(() => {
+    return allActivities.filter(activity => {
+      // Search term filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        if (!activity.text.toLowerCase().includes(searchLower)) {
+          return false;
+        }
+      }
+
+      // Category filter
+      if (filters.category !== 'all' && activity.category !== filters.category) {
+        return false;
+      }
+
+      // Date range filter
+      if (filters.dateFrom || filters.dateTo) {
+        try {
+          const activityDate = parseISO(activity.date);
+          
+          if (filters.dateFrom && isBefore(activityDate, startOfDay(filters.dateFrom))) {
+            return false;
+          }
+          
+          if (filters.dateTo && isAfter(activityDate, endOfDay(filters.dateTo))) {
+            return false;
+          }
+        } catch (error) {
+          console.error('Error parsing date:', error);
+          return false;
+        }
+      }
+
+      // Time range filter
+      if (filters.timeFrom || filters.timeTo) {
+        const activityHour = parseInt(activity.hour);
+        
+        if (filters.timeFrom) {
+          const [fromHour] = filters.timeFrom.split(':').map(Number);
+          if (activityHour < fromHour) return false;
+        }
+        
+        if (filters.timeTo) {
+          const [toHour] = filters.timeTo.split(':').map(Number);
+          if (activityHour > toHour) return false;
+        }
+      }
+
+      return true;
+    });
+  }, [allActivities, filters]);
+
+  const updateFilters = (newFilters: Partial<SearchFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
-}
+
+  const clearFilters = () => {
+    setFilters({
+      searchTerm: '',
+      category: 'all',
+    });
+  };
+
+  // Statistics for filtered results
+  const stats = useMemo(() => {
+    const total = filteredActivities.length;
+    const productive = filteredActivities.filter(a => a.category === 'productive').length;
+    const unproductive = filteredActivities.filter(a => a.category === 'unproductive').length;
+    const neutral = filteredActivities.filter(a => a.category === 'neutral').length;
+
+    return {
+      total,
+      productive,
+      unproductive,
+      neutral,
+      productivityRate: total > 0 ? Math.round((productive / total) * 100) : 0,
+    };
+  }, [filteredActivities]);
+
+  // Most common activities
+  const commonActivities = useMemo(() => {
+    const activityCounts: Record<string, number> = {};
+    
+    filteredActivities.forEach(activity => {
+      const text = activity.text.toLowerCase().trim();
+      activityCounts[text] = (activityCounts[text] || 0) + 1;
+    });
+
+    return Object.entries(activityCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([text, count]) => ({ text, count }));
+  }, [filteredActivities]);
+
+  return {
+    filters,
+    filteredActivities,
+    updateFilters,
+    clearFilters,
+    stats,
+    commonActivities,
+    totalActivities: allActivities.length,
+  };
+};
